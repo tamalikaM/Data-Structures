@@ -104,19 +104,70 @@ public class BinarySearchTreeOperations<E extends Comparable<? super E>> {
         TreeNode<E> curr = root;
         int comp = data.compareTo(curr.getData());;
         while(comp < 0 && curr.getLeftChild() != null || comp > 0 && curr.getRightChild() != null){
-            comp = data.compareTo(curr.getData());
             if(comp > 0)
                 curr = curr.getRightChild();
             else
                 curr = curr.getLeftChild();
+            comp = data.compareTo(curr.getData());
         }
-        comp = data.compareTo(curr.getData());
         if(comp > 0)
             curr.setRightChild(data);
         else if(comp > 0)
             curr.setLeftChild(data);
         else
             return false;
+        return true;
+    }
+
+    private TreeNode<E> findMin(TreeNode<E> startNode) {
+        if(startNode == null)
+            return null;
+        if(startNode.getLeftChild() != null)
+            return findMin(startNode.getLeftChild());
+        return startNode;
+    }
+
+    private boolean deleteNode(E element, TreeNode<E> startNode) {
+        if(element == null) {
+            throw new NullPointerException();
+        }
+
+        if(startNode == null)
+            return false;
+        TreeNode<E> curr = startNode;
+        //loop exits when the node is found or if it's the last node
+        int comp = element.compareTo(curr.getData());
+        while(comp < 0 && curr.getLeftChild() != null ||  comp > 0 && curr.getRightChild() != null){
+            if(comp > 0)
+                curr = curr.getRightChild();
+            else
+                curr = curr.getLeftChild();
+            comp = element.compareTo(curr.getData());
+        }
+        if(comp != 0)
+            return false;
+        //start deletion
+        //no child
+        if(curr.getLeftChild() == null && curr.getRightChild() == null)
+            curr = null;
+        //two children
+        else if(curr.getRightChild() != null && curr.getLeftChild() != null){
+            TreeNode<E> temp = findMin(curr.getRightChild());
+            curr.setData(temp.getData());
+            deleteNode(temp.getData(),curr.getRightChild());
+        }
+        else{
+            TreeNode<E> temp;
+            if(curr.getLeftChild() == null) {
+                temp = curr.getRightChild();
+                curr.setRightChild(null);
+            }
+            else{
+                temp = curr.getLeftChild();
+                curr.setRightChild(null);
+            }
+            curr.setData(temp.getData());
+        }
         return true;
     }
 }
@@ -139,12 +190,19 @@ class  TreeNode<E>  {
     }
 
     public void setRightChild(E data) {
+        if(data == null)
+            rightChild = null;
         rightChild.data = data;
     }
     public void setLeftChild(E data) {
+        if(data == null)
+            leftChild = null;
         leftChild.data = data;
     }
     public E getData(){
         return data;
+    }
+    public void setData(E data) {
+        this.data = data;
     }
 }
